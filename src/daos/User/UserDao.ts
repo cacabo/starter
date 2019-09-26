@@ -26,7 +26,6 @@ export class UserDao implements IUserDao {
   }
 
   /**
-   *
    * @param user
    */
   public async add(user: IUser): Promise<void> {
@@ -35,7 +34,6 @@ export class UserDao implements IUserDao {
   }
 
   /**
-   *
    * @param user
    */
   public async update(user: IUser): Promise<void> {
@@ -44,7 +42,6 @@ export class UserDao implements IUserDao {
   }
 
   /**
-   *
    * @param id
    */
   public async delete(id: number): Promise<void> {
