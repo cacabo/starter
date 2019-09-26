@@ -2,6 +2,7 @@
   "name": "starter",
   "author": "Cameron Cabo <cameroncabo@gmail.com>",
   "description": "Starter web server built on Express",
+  "license": "MIT",
   "version": "0.0.0",
   "scripts": {
     "build": "node ./util/build.js",
