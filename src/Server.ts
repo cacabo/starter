@@ -2,6 +2,8 @@ import cookieParser from 'cookie-parser'
 import express from 'express'
 import logger from 'morgan'
 import path from 'path'
+import mongoose from 'mongoose'
+
 import BaseRouter from './routes'
 
 import { Request, Response } from 'express'
@@ -9,6 +11,8 @@ import { jwtCookieProps } from '@shared'
 
 // Init express
 const app = express()
+
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/starter')
 
 // Add middleware/settings/routes to express.
 app.use(logger('dev'))

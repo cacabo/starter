@@ -20,10 +20,6 @@ export const pErr = (err: Error) => {
   }
 }
 
-export const getRandomInt = () => {
-  return Math.floor(Math.random() * 1_000_000_000_000)
-}
-
 // Middleware to verify if user is an admin
 export const adminMW = async (
   req: Request,

@@ -6,6 +6,7 @@ export enum UserRoles {
 type TUserRoles = UserRoles.Standard | UserRoles.Admin
 
 export interface IUser {
+  _id: any
   firstName: string
   lastName: string
   email: string
@@ -14,6 +15,7 @@ export interface IUser {
 }
 
 export class User implements IUser {
+  public _id: any
   public firstName: string
   public lastName: string
   public email: string

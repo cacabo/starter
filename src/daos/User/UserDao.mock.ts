@@ -1,5 +1,5 @@
+import uuidv4 from 'uuid/v4'
 import { IUser } from '@entities'
-import { getRandomInt } from '@shared'
 import { MockDaoMock } from '../MockDb/MockDao.mock'
 import { IUserDao } from './UserDao'
 
@@ -30,7 +30,7 @@ export class UserDao extends MockDaoMock implements IUserDao {
   public async add(user: IUser): Promise<void> {
     try {
       const db = await super.openDb()
-      user.id = getRandomInt()
+      user._id = uuidv4()
       db.users.push(user)
       await super.saveDb(db)
     } catch (err) {
@@ -42,7 +42,7 @@ export class UserDao extends MockDaoMock implements IUserDao {
     try {
       const db = await super.openDb()
       for (let i = 0; i < db.users.length; i++) {
-        if (db.users[i].id === user.id) {
+        if (db.users[i]._id === user._id) {
           db.users[i] = user
           await super.saveDb(db)
           return
@@ -54,11 +54,11 @@ export class UserDao extends MockDaoMock implements IUserDao {
     }
   }
 
-  public async delete(id: number): Promise<void> {
+  public async delete(id: any): Promise<void> {
     try {
       const db = await super.openDb()
       for (let i = 0; i < db.users.length; i++) {
-        if (db.users[i].id === id) {
+        if (db.users[i]._id === id) {
           db.users.splice(i, 1)
           await super.saveDb(db)
           return
