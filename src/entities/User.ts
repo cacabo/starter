@@ -6,41 +6,40 @@ export enum UserRoles {
 type TUserRoles = UserRoles.Standard | UserRoles.Admin
 
 export interface IUser {
-  id?: number
-  name: string
+  firstName: string
+  lastName: string
   email: string
   passwordHash: string
-  passwordSalt: string
   role: TUserRoles
 }
 
 export class User implements IUser {
-  public id?: number
-  public name: string
+  public firstName: string
+  public lastName: string
   public email: string
   public role: TUserRoles
   public passwordHash: string
-  public passwordSalt: string
 
   constructor(
-    nameOrUser?: string | IUser,
+    user?: IUser,
+    firstName?: string,
+    lastName?: string,
     email?: string,
     role?: TUserRoles,
-    passwordHash?: string,
-    passwordSalt?: string
+    passwordHash?: string
   ) {
-    if (typeof nameOrUser === 'string' || typeof nameOrUser === 'undefined') {
-      this.name = nameOrUser || ''
+    if (typeof user === 'undefined') {
+      this.firstName = firstName || ''
+      this.lastName = lastName || ''
       this.email = email || ''
       this.role = role || UserRoles.Standard
       this.passwordHash = passwordHash || ''
-      this.passwordSalt = passwordSalt || ''
     } else {
-      this.name = nameOrUser.name
-      this.email = nameOrUser.email
-      this.role = nameOrUser.role
-      this.passwordHash = nameOrUser.passwordHash
-      this.passwordSalt = nameOrUser.passwordSalt
+      this.lastName = user.lastName
+      this.firstName = user.firstName
+      this.email = user.email
+      this.role = user.role
+      this.passwordHash = user.passwordHash
     }
   }
 }
