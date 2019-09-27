@@ -3,15 +3,45 @@ import { User } from '@entities'
 
 export interface IUserModel extends User, Document {}
 
-// TODO validators
+const validateEmail = function(email: string) {
+  const re: RegExp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+  return re.test(email) as boolean
+}
 
 export var UserSchema: Schema = new Schema(
   {
-    email: String,
-    firstName: String,
-    lastName: String,
-    role: Number,
-    passwordHash: String,
+    email: {
+      type: String,
+      unique: true,
+      required: true,
+      trim: true,
+      minlength: 3,
+      maxlength: 254,
+      validate: [validateEmail, 'Please fill a valid email address'],
+      index: true,
+    },
+    firstName: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 1,
+      maxlength: 100,
+    },
+    lastName: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 1,
+      maxlength: 100,
+    },
+    role: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 2,
+      validate: [Number.isInteger, 'Role must be an integer'],
+    },
+    passwordHash: { type: String, required: true },
   },
   { timestamps: true }
 )

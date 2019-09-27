@@ -4,7 +4,27 @@ import { MockDaoMock } from '../MockDb/MockDao.mock'
 import { IUserDao } from './UserDao'
 
 export class UserDao extends MockDaoMock implements IUserDao {
-  public async getOne(email: string): Promise<IUser | null> {
+  /**
+   * @param id
+   */
+  public async getOne(id: any): Promise<IUser | null> {
+    try {
+      const db = await super.openDb()
+      for (const user of db.users) {
+        if (user._id === id) {
+          return user
+        }
+      }
+      return null
+    } catch (err) {
+      throw err
+    }
+  }
+
+  /**
+   * @param email
+   */
+  public async getOneByEmail(email: string): Promise<IUser | null> {
     try {
       const db = await super.openDb()
       for (const user of db.users) {
@@ -27,12 +47,13 @@ export class UserDao extends MockDaoMock implements IUserDao {
     }
   }
 
-  public async add(user: IUser): Promise<void> {
+  public async add(user: IUser): Promise<IUser> {
     try {
       const db = await super.openDb()
       user._id = uuidv4()
       db.users.push(user)
       await super.saveDb(db)
+      return user
     } catch (err) {
       throw err
     }
