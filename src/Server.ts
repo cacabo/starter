@@ -12,7 +12,13 @@ import { jwtCookieProps } from '@shared'
 // Init express
 const app = express()
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/starter')
+mongoose.connect(
+  process.env.MONGODB_URI || 'mongodb://localhost:27017/starter',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  },
+)
 
 // Add middleware/settings/routes to express.
 app.use(logger('dev'))

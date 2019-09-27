@@ -40,7 +40,7 @@ export class User implements IUser {
       this.lastName = user.lastName
       this.firstName = user.firstName
       this.email = user.email
-      this.role = user.role
+      this.role = user.role || UserRoles.Standard
       this.passwordHash = user.passwordHash
     }
   }

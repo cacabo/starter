@@ -11,7 +11,7 @@ export class UserDao extends MockDaoMock implements IUserDao {
     try {
       const db = await super.openDb()
       for (const user of db.users) {
-        if (user.id === id) {
+        if (user._id === id) {
           return user
         }
       }
@@ -50,7 +50,7 @@ export class UserDao extends MockDaoMock implements IUserDao {
   public async add(user: IUser): Promise<IUser> {
     try {
       const db = await super.openDb()
-      user.id = uuidv4()
+      user._id = uuidv4()
       db.users.push(user)
       await super.saveDb(db)
       return user
@@ -63,7 +63,7 @@ export class UserDao extends MockDaoMock implements IUserDao {
     try {
       const db = await super.openDb()
       for (let i = 0; i < db.users.length; i++) {
-        if (db.users[i].id === user.id) {
+        if (db.users[i].id === user._id) {
           db.users[i] = user
           await super.saveDb(db)
           return
@@ -79,7 +79,7 @@ export class UserDao extends MockDaoMock implements IUserDao {
     try {
       const db = await super.openDb()
       for (let i = 0; i < db.users.length; i++) {
-        if (db.users[i].id === id) {
+        if (db.users[i]._id === id) {
           db.users.splice(i, 1)
           await super.saveDb(db)
           return
