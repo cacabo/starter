@@ -41,7 +41,7 @@ export class UserDao implements IUserDao {
    * @param user
    */
   public async update(user: IUser): Promise<void> {
-    return UserModel.findByIdAndUpdate(user._id, user).then(somtimesUser => {
+    return UserModel.findByIdAndUpdate(user.id, user).then(somtimesUser => {
       if (!somtimesUser) throw new Error('User not found')
       return
     })

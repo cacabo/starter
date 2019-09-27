@@ -6,14 +6,21 @@
     "ordered-imports": false,
     "quotemark": [true, "single"],
     "no-consecutive-blank-lines": false,
-    "lines-between-class-members": [true, 2]
+    "lines-between-class-members": [true, 1],
+    "semicolon": [true, "never"],
+    "curly": [true, "ignore-same-line"],
+    "arrow-parens": [true, "ban-single-arg-parens"],
+    "variable-name": {
+      "options": [
+        "ban-keywords",
+        "check-format",
+        "allow-leading-underscore",
+        "allow-pascal-case"
+      ]
+    }
   },
   "linterOptions": {
-    "exclude": [
-      "./node_modules/**"
-    ]
+    "exclude": ["./node_modules/**"]
   },
-  "rulesDirectory": [
-    "node_modules/tslint-lines-between-class-members"
-  ]
+  "rulesDirectory": ["node_modules/tslint-lines-between-class-members"]
 }

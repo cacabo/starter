@@ -35,9 +35,24 @@ describe('UserRouter', () => {
         "${OK}" if the request was successful.`, done => {
       // Setup Dummy Data
       const users = [
-        new User('Sean Maxwell', 'sean.maxwell@gmail.com'),
-        new User('John Smith', 'john.smith@gmail.com'),
-        new User('Gordan Freeman', 'gordan.freeman@gmail.com'),
+        new User({
+          _id: '1',
+          firstName: 'Sean',
+          lastName: 'Maxwell',
+          email: 'sean.maxwell@gmail.com',
+        }),
+        new User({
+          _id: '2',
+          firstName: 'John',
+          lastName: 'Smith',
+          email: 'john.smith@gmail.com',
+        }),
+        new User({
+          _id: '3',
+          firstName: 'Gordan',
+          lastName: 'Freeman',
+          email: 'gordan.freeman@gmail.com',
+        }),
       ]
       spyOn(UserDao.prototype, 'getAll').and.returnValue(Promise.resolve(users))
 

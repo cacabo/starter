@@ -10,8 +10,8 @@ export interface IUser {
   firstName: string
   lastName: string
   email: string
-  passwordHash: string
-  role: TUserRoles
+  passwordHash?: string
+  role?: TUserRoles
 }
 
 export class User implements IUser {
@@ -20,7 +20,7 @@ export class User implements IUser {
   public lastName: string
   public email: string
   public role: TUserRoles
-  public passwordHash: string
+  public passwordHash?: string
 
   constructor(
     user?: IUser,
@@ -28,7 +28,7 @@ export class User implements IUser {
     lastName?: string,
     email?: string,
     role?: TUserRoles,
-    passwordHash?: string
+    passwordHash?: string,
   ) {
     if (typeof user === 'undefined') {
       this.firstName = firstName || ''

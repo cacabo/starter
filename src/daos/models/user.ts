@@ -3,12 +3,12 @@ import { User } from '@entities'
 
 export interface IUserModel extends User, Document {}
 
-const validateEmail = function(email: string) {
+const validateEmail = (email: string) => {
   const re: RegExp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
   return re.test(email) as boolean
 }
 
-export var UserSchema: Schema = new Schema(
+export const UserSchema: Schema = new Schema(
   {
     email: {
       type: String,
@@ -43,10 +43,10 @@ export var UserSchema: Schema = new Schema(
     },
     passwordHash: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 
 export const UserModel: Model<IUserModel> = model<IUserModel>(
   'User',
-  UserSchema
+  UserSchema,
 )

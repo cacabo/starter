@@ -47,7 +47,7 @@ if (NODE_ENV === 'production') {
     format: format.combine(
       format.colorize(),
       format.simple(),
-      errorStackFormat()
+      errorStackFormat(),
     ),
   })
   wintstonLogger.add(consoleTransport)

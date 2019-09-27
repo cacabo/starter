@@ -37,10 +37,17 @@ describe('UserRouter', () => {
       }
 
       const role = UserRoles.Standard
-      const pwdHash = hashPwd(creds.password)
-      const loginUser = new User('john smith', creds.email, role, pwdHash)
+      const passwordHash = hashPwd(creds.password)
+      const loginUser = new User({
+        firstName: 'john',
+        lastName: 'smith',
+        email: creds.email,
+        role,
+        passwordHash,
+        _id: '1234567890',
+      })
       spyOn(UserDao.prototype, 'getOne').and.returnValue(
-        Promise.resolve(loginUser)
+        Promise.resolve(loginUser),
       )
 
       // Call API
@@ -78,10 +85,17 @@ describe('UserRouter', () => {
         password: 'someBadPassword',
       }
       const role = UserRoles.Standard
-      const pwdHash = hashPwd('Password@1')
-      const loginUser = new User('john smith', creds.email, role, pwdHash)
+      const passwordHash = hashPwd('Password@1')
+      const loginUser = new User({
+        _id: 'fewahudsi',
+        firstName: 'john',
+        lastName: 'smith',
+        email: creds.email,
+        role,
+        passwordHash,
+      })
       spyOn(UserDao.prototype, 'getOne').and.returnValue(
-        Promise.resolve(loginUser)
+        Promise.resolve(loginUser),
       )
 
       // Call API
@@ -101,7 +115,7 @@ describe('UserRouter', () => {
         password: 'someBadPassword',
       }
       spyOn(UserDao.prototype, 'getOne').and.throwError(
-        'Database query failed.'
+        'Database query failed.',
       )
 
       // Call API

@@ -24,7 +24,7 @@ export const pErr = (err: Error) => {
 export const adminMW = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     // Get json-web-token

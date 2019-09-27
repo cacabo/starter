@@ -13,8 +13,16 @@ export const login = (beforeAgent: SuperTest<Test>, done: any) => {
   // Setup dummy data
   const role = UserRoles.Admin
   const pwdHash = bcrypt.hashSync(creds.password, pwdSaltRounds)
-  const loginUser = new User('john smith', creds.email, role, pwdHash)
+  const loginUser = new User({
+    _id: '1234567890',
+    firstName: 'john',
+    lastName: 'smith',
+    email: creds.email,
+    role,
+    passwordHash: pwdHash,
+  })
   spyOn(UserDao.prototype, 'getOne').and.returnValue(Promise.resolve(loginUser))
+
   // Call Login API
   beforeAgent
     .post('/api/auth/login')
