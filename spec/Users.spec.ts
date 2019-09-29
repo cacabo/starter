@@ -40,18 +40,21 @@ describe('UserRouter', () => {
           firstName: 'Sean',
           lastName: 'Maxwell',
           email: 'sean.maxwell@gmail.com',
+          passwordHash: '13rwqgra',
         }),
         new User({
           _id: '2',
           firstName: 'John',
           lastName: 'Smith',
           email: 'john.smith@gmail.com',
+          passwordHash: 'rfewraeh',
         }),
         new User({
           _id: '3',
           firstName: 'Gordan',
           lastName: 'Freeman',
           email: 'gordan.freeman@gmail.com',
+          passwordHash: 'faefdfgfds',
         }),
       ]
       spyOn(UserDao.prototype, 'getAll').and.returnValue(Promise.resolve(users))
@@ -95,7 +98,13 @@ describe('UserRouter', () => {
     }
 
     const userData = {
-      user: new User('Gordan Freeman', 'gordan.freeman@gmail.com'),
+      user: new User({
+        _id: '4',
+        firstName: 'Gordan',
+        lastName: 'Freeman',
+        email: 'gordan.freeman@gmail.com',
+        passwordHash: 'refwaghgeth',
+      }),
     }
 
     it(`should return a status code of "${CREATED}" if the request was successful.`, done => {
@@ -144,7 +153,13 @@ describe('UserRouter', () => {
     }
 
     const userData = {
-      user: new User('Gordan Freeman', 'gordan.freeman@gmail.com'),
+      user: new User({
+        _id: '5',
+        firstName: 'Gordan',
+        lastName: 'Freeman',
+        email: 'gordan.freeman@gmail.com',
+        passwordHash: 'refwaghgeth',
+      }),
     }
 
     it(`should return a status code of "${OK}" if the request was successful.`, done => {

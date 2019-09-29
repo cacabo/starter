@@ -2,23 +2,13 @@
 const {
   env: {
     JWT_COOKIE_PATH,
-    HTTP_ONLY_COOKIE,
-    SIGNED_COOKIE,
+    HTTP_ONLY_COOKIE = false,
+    SIGNED_COOKIE = false,
     COOKIE_DOMAIN,
-    SECURE_COOKIE,
+    SECURE_COOKIE = false,
     jwtCookieExp: JWT_COOKIE_EXP,
   },
 } = process
-
-if (
-  JWT_COOKIE_PATH === undefined ||
-  HTTP_ONLY_COOKIE === undefined ||
-  SIGNED_COOKIE === undefined ||
-  COOKIE_DOMAIN === undefined ||
-  SECURE_COOKIE === undefined
-) {
-  throw new Error('Env is missing required cookie attributes')
-}
 
 export const jwtCookieExp = JWT_COOKIE_EXP || 3
 

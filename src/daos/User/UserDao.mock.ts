@@ -1,5 +1,5 @@
 import uuidv4 from 'uuid/v4'
-import { IUser } from '@entities'
+import { IUser, IPasswordResetRequest } from '@entities'
 import { MockDaoMock } from '../MockDb/MockDao.mock'
 import { IUserDao } from './UserDao'
 
@@ -59,14 +59,14 @@ export class UserDao extends MockDaoMock implements IUserDao {
     }
   }
 
-  public async update(user: IUser): Promise<void> {
+  public async update(user: IUser): Promise<IUser> {
     try {
       const db = await super.openDb()
       for (let i = 0; i < db.users.length; i++) {
         if (db.users[i].id === user._id) {
           db.users[i] = user
           await super.saveDb(db)
-          return
+          return user
         }
       }
       throw new Error('User not found')
@@ -89,5 +89,70 @@ export class UserDao extends MockDaoMock implements IUserDao {
     } catch (err) {
       throw err
     }
+  }
+
+  /**
+   * @param id of the user
+   * @param password existing
+   * @param newPassword to replace existing one
+   */
+  public async changePassword(
+    id: any,
+    password: string,
+    newPassword: string,
+  ): Promise<IUser> {
+    const user = await this.getOne(id)
+    if (!user) throw new Error('User not found')
+    const { passwordHash } = user
+    if (password !== passwordHash) throw new Error('Passwords do not match')
+    const editedUser = Object.assign({}, user, {
+      passwordHash: newPassword,
+    })
+    return await this.update(editedUser)
+  }
+
+  /**
+   * @param id of the user
+   */
+  public async requestForgotPassword(id: any) {
+    const user = await this.getOne(id)
+    if (!user) throw new Error('User not found')
+    const token = uuidv4() // Create a new random token
+    const hourInMs = 1000 * 60 * 60
+    const passwordResetRequest: IPasswordResetRequest = {
+      token,
+      expires: new Date(Date.now() + hourInMs),
+    }
+
+    const editedUser: IUser = Object.assign({}, user, { passwordResetRequest })
+    return await this.update(editedUser)
+  }
+
+  /**
+   * @param id of the user
+   * @param token emailed to user to replace their password with
+   * @param newPassword to replace existing one
+   */
+  public async resetForgotPassword(
+    id: any,
+    token: string,
+    newPassword: string,
+  ) {
+    const user = await this.getOne(id)
+
+    // Validations
+    if (!user) throw new Error('User not found')
+    const { passwordResetRequest } = user
+    if (!passwordResetRequest) throw new Error('No reset request found')
+    const { token: existingToken, expires } = passwordResetRequest
+    if (token !== existingToken) throw new Error('Tokens do not match')
+    const date = Date.now()
+    if (date > expires.getTime()) throw new Error('Token expired')
+
+    const editedUser: IUser = Object.assign({}, user, {
+      passwordResetRequest: null,
+      passwordHash: newPassword,
+    })
+    return await this.update(editedUser)
   }
 }

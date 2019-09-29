@@ -5,6 +5,11 @@ export enum UserRoles {
 
 type TUserRoles = UserRoles.Standard | UserRoles.Admin
 
+export interface IPasswordResetRequest {
+  token: string
+  expires: Date
+}
+
 export interface IUser {
   _id: any
   firstName: string
@@ -12,13 +17,8 @@ export interface IUser {
   email: string
   role?: TUserRoles
 
-  passwordHash?: string
-  passwordResetRequest?: {}
-}
-
-export interface IPasswordResetRequest {
-  token: string
-  expires: Date
+  passwordHash: string
+  passwordResetRequest?: IPasswordResetRequest
 }
 
 export class User implements IUser {
@@ -31,16 +31,25 @@ export class User implements IUser {
   public passwordResetRequest?: IPasswordResetRequest
 
   constructor(
-    firstName: string,
-    lastName: string,
-    email: string,
-    passwordHash: string,
+    user?: IUser,
+    firstName?: string,
+    lastName?: string,
+    email?: string,
+    passwordHash?: string,
     role?: TUserRoles,
   ) {
-    this.firstName = firstName || ''
-    this.lastName = lastName || ''
-    this.email = email || ''
-    this.role = role || UserRoles.Standard
-    this.passwordHash = passwordHash || ''
+    if (user) {
+      this.firstName = user.firstName
+      this.lastName = user.lastName
+      this.email = user.email
+      this.passwordHash = user.passwordHash
+      this.role = user.role || UserRoles.Standard
+    } else {
+      this.firstName = firstName || ''
+      this.lastName = lastName || ''
+      this.email = email || ''
+      this.role = role || UserRoles.Standard
+      this.passwordHash = passwordHash || ''
+    }
   }
 }

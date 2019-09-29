@@ -77,7 +77,7 @@ export class UserDao implements IUserDao {
 
     // TOOD hash bassword
     // TODO is object.assign necessary?
-    const editedUser = Object.assign({}, user, {
+    const editedUser: IUser = Object.assign({}, user, {
       passwordHash: 'TODO',
     })
     return await this.update(editedUser)
@@ -97,7 +97,7 @@ export class UserDao implements IUserDao {
     }
 
     // TODO send email
-    const editedUser: User = Object.assign({}, user, { passwordResetRequest })
+    const editedUser: IUser = Object.assign({}, user, { passwordResetRequest })
     return await this.update(editedUser)
   }
 
@@ -120,7 +120,7 @@ export class UserDao implements IUserDao {
     const date = Date.now()
     // TODO test that this is correct
     if (date > expires.getTime()) throw new Error('Token expired')
-    const editedUser: User = Object.assign({}, user, {
+    const editedUser: IUser = Object.assign({}, user, {
       passwordResetRequest: null,
       passwordHash: 'TODO',
     })
