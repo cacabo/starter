@@ -39,7 +39,7 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 
     // Check password
-    const pwdPassed = await bcrypt.compare(password, user.pwdHash)
+    const pwdPassed = await bcrypt.compare(password, user.passwordHash)
     if (!pwdPassed) {
       return res.status(UNAUTHORIZED).json({
         error: loginFailedErr,
@@ -52,7 +52,6 @@ router.post('/login', async (req: Request, res: Response) => {
     })
     const { key, options } = jwtCookieProps
     res.cookie(key, jwt, options)
-    // Return
     return res.status(OK).end()
   } catch (err) {
     logger.error(err.message, err)

@@ -12,13 +12,29 @@ import { jwtCookieProps } from '@shared'
 // Init express
 const app = express()
 
-mongoose.connect(
-  process.env.MONGODB_URI || 'mongodb://localhost:27017/starter',
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  },
-)
+/**
+ * Connect to the MongoDB database
+ * If this fails, throw an error and exit the app
+ */
+const connectToMongo = async () => {
+  try {
+    console.log('Connecting to MongoDB database...') // tslint:disable-line
+    await mongoose.connect(
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/starter',
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      },
+    )
+
+    console.log('Connected to database successfully.') // tslint:disable-line
+  } catch (error) {
+    console.log('There was an error connecting to the database.') // tslint:disable-line
+    process.exit(1)
+  }
+}
+
+connectToMongo()
 
 // Add middleware/settings/routes to express.
 app.use(logger('dev'))

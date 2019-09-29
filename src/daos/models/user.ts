@@ -42,6 +42,10 @@ export const UserSchema: Schema = new Schema(
       validate: [Number.isInteger, 'Role must be an integer'],
     },
     passwordHash: { type: String, required: true },
+    passwordResetRequest: {
+      token: String,
+      expires: Date,
+    },
   },
   { timestamps: true },
 )

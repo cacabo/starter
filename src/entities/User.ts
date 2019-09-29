@@ -10,8 +10,15 @@ export interface IUser {
   firstName: string
   lastName: string
   email: string
-  passwordHash?: string
   role?: TUserRoles
+
+  passwordHash?: string
+  passwordResetRequest?: {}
+}
+
+export interface IPasswordResetRequest {
+  token: string
+  expires: Date
 }
 
 export class User implements IUser {
@@ -20,28 +27,20 @@ export class User implements IUser {
   public lastName: string
   public email: string
   public role: TUserRoles
-  public passwordHash?: string
+  public passwordHash: string
+  public passwordResetRequest?: IPasswordResetRequest
 
   constructor(
-    user?: IUser,
-    firstName?: string,
-    lastName?: string,
-    email?: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    passwordHash: string,
     role?: TUserRoles,
-    passwordHash?: string,
   ) {
-    if (typeof user === 'undefined') {
-      this.firstName = firstName || ''
-      this.lastName = lastName || ''
-      this.email = email || ''
-      this.role = role || UserRoles.Standard
-      this.passwordHash = passwordHash || ''
-    } else {
-      this.lastName = user.lastName
-      this.firstName = user.firstName
-      this.email = user.email
-      this.role = user.role || UserRoles.Standard
-      this.passwordHash = user.passwordHash
-    }
+    this.firstName = firstName || ''
+    this.lastName = lastName || ''
+    this.email = email || ''
+    this.role = role || UserRoles.Standard
+    this.passwordHash = passwordHash || ''
   }
 }

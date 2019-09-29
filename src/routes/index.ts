@@ -11,7 +11,7 @@ router.use('/users', UserRouter)
 router.use('/auth', AuthRouter)
 
 router.get('/', async (_, res) => {
-  res.status(OK).send({ success: true })
+  res.status(OK).send('API is up and running')
 })
 
 export default router
