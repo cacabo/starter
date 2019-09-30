@@ -88,7 +88,10 @@ export class UserDao implements IUserDao {
     if (!user) throw new Error('User not found')
     const { passwordHash } = user
     // TODO compare passwords elsewhere (import from auth?)
-    await bcrypt.compare(password, passwordHash)
+    const passwordPassed = await bcrypt.compare(password, passwordHash)
+    if (!passwordPassed) {
+      throw new Error('Invalid password')
+    }
 
     // TOOD hash bassword
     // TODO is object.assign necessary?

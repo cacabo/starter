@@ -8,13 +8,20 @@ import { JwtService } from './JwtService'
 // Init shared service
 const jwtService = new JwtService()
 
-export const paramMissingError =
-  'One or more of the required parameters was missing.'
+export const paramMissingError = (param?: string) => {
+  if (!param) {
+    return 'One or more of the required parameters was missing.'
+  }
+  return `Missing ${param} parameter.`
+}
+
+export const passwordsDoNotMatchError = 'Passwords do not match'
+
 export const loginFailedErr = 'Login failed'
 
 export const pwdSaltRounds = 12
 
-export const pErr = (err: Error) => {
+export const logErr = (err: Error) => {
   if (err) {
     logger.error(err)
   }

@@ -2,28 +2,16 @@ import { Request, Response, Router } from 'express'
 import { BAD_REQUEST, CREATED, OK, NOT_FOUND } from 'http-status-codes'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { UserDao } from '@daos'
-import { paramMissingError, logger, adminMW } from '@shared'
-import { UserRoles, IUser, ICreateUser, User } from '@entities'
+import { paramMissingError, adminMW } from '@shared'
+import { IUser } from '@entities'
 import { IUserDao } from 'src/daos/User/UserDao'
+import { handleError, handleNotFound, handleBadRequest } from './handlers'
 
-// TODO have more than just admin MW
+// TODO have more than just admin MW (probably need more info in the JWT)
 
 // Init shared
 const router = Router()
 const userDao: IUserDao = new UserDao()
-
-const handleErrorGenerator = (status: number) => (res: Response, msg: string) =>
-  res.status(status).json({ error: msg })
-
-const handleError = (res: Response, err: Error) => {
-  logger.error(err.message, err)
-  return res.status(BAD_REQUEST).json({
-    error: err.message,
-  })
-}
-
-const handleNotFound = handleErrorGenerator(NOT_FOUND)
-const handleBadRequest = handleErrorGenerator(BAD_REQUEST)
 
 /**
  * Get all users
@@ -53,34 +41,6 @@ router.get('/:id', adminMW, async (req: Request, res: Response) => {
   }
 })
 
-export interface INewUserBody {
-  user: ICreateUser
-}
-
-/**
- * Create a new user
- *
- * TODO what is the difference between new and signup?
- */
-router.post('/new', adminMW, async (req: Request, res: Response) => {
-  try {
-    // Check parameters
-    const { user } = req.body as INewUserBody
-    if (!user) {
-      return res.status(BAD_REQUEST).json({
-        error: paramMissingError,
-      })
-    }
-
-    // Add new user
-    const userObj: IUser = new User(user)
-    await userDao.create(userObj)
-    return res.status(CREATED).end()
-  } catch (err) {
-    handleError(res, err)
-  }
-})
-
 export interface IUpdateUserBody {
   user: Partial<IUser>
 }
@@ -96,7 +56,7 @@ router.put('/:id/update', adminMW, async (req: Request, res: Response) => {
     const { user } = req.body as IUpdateUserBody
     if (!user) {
       return res.status(BAD_REQUEST).json({
-        error: paramMissingError,
+        error: paramMissingError(),
       })
     }
 

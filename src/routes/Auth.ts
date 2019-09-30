@@ -1,21 +1,70 @@
 import bcrypt from 'bcrypt'
 import { Request, Response, Router } from 'express'
-import { BAD_REQUEST, OK, UNAUTHORIZED } from 'http-status-codes'
+import { BAD_REQUEST, OK, UNAUTHORIZED, CREATED } from 'http-status-codes'
 import { UserDao } from '@daos'
-
-// TODO deal with salt
 
 import {
   paramMissingError,
+  passwordsDoNotMatchError,
   loginFailedErr,
   logger,
   jwtCookieProps,
   JwtService,
+  pwdSaltRounds,
 } from '@shared'
+import { handleBadRequest, handleError } from './handlers'
+import { User, IUser } from '@entities'
 
 const router = Router()
 const userDao = new UserDao()
 const jwtService = new JwtService()
+
+export interface IRegisterUserBody {
+  email: string
+  password: string
+  confirmPassword: string
+  firstName: string
+  lastName: string
+}
+
+router.post('/register', async (req: Request, res: Response) => {
+  try {
+    const {
+      email,
+      password,
+      confirmPassword,
+      firstName,
+      lastName,
+    } = req.body as IRegisterUserBody
+
+    if (!email) return handleBadRequest(res, paramMissingError('email'))
+    if (!firstName) {
+      return handleBadRequest(res, paramMissingError('first name'))
+    }
+    if (!lastName) return handleBadRequest(res, paramMissingError('last name'))
+    if (!password) return handleBadRequest(res, paramMissingError('password'))
+    if (!confirmPassword) {
+      return handleBadRequest(res, 'Missing password confirmation')
+    }
+    if (password.length < 8) {
+      return handleBadRequest(res, 'Password must be at least 8 characters.')
+    }
+    if (password !== confirmPassword) {
+      return handleBadRequest(res, passwordsDoNotMatchError)
+    }
+    const passwordHash = await bcrypt.hash(password, pwdSaltRounds)
+    const user: IUser = new User({
+      firstName,
+      lastName,
+      email,
+      passwordHash,
+    })
+    await userDao.create(user)
+    return res.status(CREATED).end()
+  } catch (err) {
+    handleError(res, err)
+  }
+})
 
 /**
  * Login
@@ -26,7 +75,7 @@ router.post('/login', async (req: Request, res: Response) => {
     const { email, password } = req.body
     if (!(email && password)) {
       return res.status(BAD_REQUEST).json({
-        error: paramMissingError,
+        error: paramMissingError(),
       })
     }
 
@@ -49,6 +98,7 @@ router.post('/login', async (req: Request, res: Response) => {
     // Setup Admin Cookie
     const jwt = await jwtService.getJwt({
       role: user.role,
+      id: user._id,
     })
     const { key, options } = jwtCookieProps
     res.cookie(key, jwt, options)

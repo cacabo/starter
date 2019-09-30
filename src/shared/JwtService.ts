@@ -4,6 +4,7 @@ import { jwtCookieExp } from './cookies'
 
 interface IClientData {
   role: number
+  id: any
 }
 
 export class JwtService {

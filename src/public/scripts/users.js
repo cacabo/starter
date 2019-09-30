@@ -84,7 +84,7 @@ function addUser() {
       email: emailInput.value,
     },
   }
-  Http.Post('/api/users/new', data).then(() => {
+  Http.Post('/api/register', data).then(() => {
     displayUsers()
   })
 }

@@ -10,13 +10,6 @@ export interface IPasswordResetRequest {
   expires: Date
 }
 
-export interface ICreateUser {
-  firstName: string
-  lastName: string
-  email: string
-  passwordHash: string
-}
-
 export interface IUser {
   _id?: string
   firstName: string

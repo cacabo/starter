@@ -2,22 +2,111 @@ import app from '@server'
 import supertest from 'supertest'
 import bcrypt from 'bcrypt'
 
-import { BAD_REQUEST, OK, UNAUTHORIZED } from 'http-status-codes'
-import { SuperTest, Test } from 'supertest'
+import { BAD_REQUEST, OK, UNAUTHORIZED, CREATED } from 'http-status-codes'
+import { Response, SuperTest, Test } from 'supertest'
 import { User, UserRoles } from '@entities'
-import { pErr, pwdSaltRounds, jwtCookieProps, loginFailedErr } from '@shared'
+import {
+  logErr,
+  pwdSaltRounds,
+  jwtCookieProps,
+  loginFailedErr,
+  paramMissingError,
+  passwordsDoNotMatchError,
+} from '@shared'
 import { UserDao } from '@daos'
 
 describe('UserRouter', () => {
   const authPath = '/api/auth'
   const loginPath = `${authPath}/login`
   const logoutPath = `${authPath}/logout`
+  const registerPath = `${authPath}/register`
 
   let agent: SuperTest<Test>
 
   beforeAll(done => {
     agent = supertest.agent(app)
     done()
+  })
+
+  describe(`"POST:${registerPath}"`, () => {
+    const callApi = (reqBody: object) => {
+      return agent
+        .post(registerPath)
+        .type('form')
+        .send(reqBody)
+    }
+
+    const userData = {
+      firstName: 'Gordan',
+      lastName: 'Freeman',
+      email: 'gordan.freeman@gmail.com',
+      password: 'reallyGoodPassword',
+      confirmPassword: 'reallyGoodPassword',
+    }
+
+    const userDataWithoutMatchingPassword = {
+      firstName: 'Gordan',
+      lastName: 'Freeman',
+      email: 'gordan.freeman@gmail.com',
+      password: 'reallyGoodPassword',
+      confirmPassword: 'notTheSamePassword',
+    }
+
+    const userDataWithNoEmail = {
+      firstName: 'Gordan',
+      lastName: 'Freeman',
+      password: 'reallyGoodPassword',
+      confirmPassword: 'reallyGoodPassword',
+    }
+
+    it(`should return a status code of "${CREATED}" if the request was successful.`, done => {
+      spyOn(UserDao.prototype, 'create').and.returnValue(Promise.resolve())
+      callApi(userData).end((err: Error, res: Response) => {
+        logErr(err)
+        expect(res.status).toBe(CREATED)
+        expect(res.body.error).toBeUndefined()
+        done()
+      })
+    })
+
+    it(`should return a status code of "${BAD_REQUEST}" if the password and confirm password did match.`, done => {
+      spyOn(UserDao.prototype, 'create').and.returnValue(Promise.resolve())
+      callApi(userDataWithoutMatchingPassword).end(
+        (err: Error, res: Response) => {
+          logErr(err)
+          expect(res.status).toBe(BAD_REQUEST)
+          expect(res.body.error).toBeDefined()
+          expect(res.body.error).toBe(passwordsDoNotMatchError)
+          done()
+        },
+      )
+    })
+
+    it(`should return a JSON object with an error message of "${paramMissingError(
+      'email',
+    )}" and a status code of "${BAD_REQUEST}" if the email param was missing.`, done => {
+      callApi(userDataWithNoEmail).end((err: Error, res: Response) => {
+        logErr(err)
+        expect(res.status).toBe(BAD_REQUEST)
+        expect(res.body.error).toBe(paramMissingError('email'))
+        done()
+      })
+    })
+
+    it(`should return a JSON object with an error message and a status code of
+        "${BAD_REQUEST}" if the request was unsuccessful.`, done => {
+      // Setup Dummy Response
+      const errMsg = 'Could not create user.'
+      spyOn(UserDao.prototype, 'create').and.throwError(errMsg)
+
+      // Call API
+      callApi(userData).end((err: Error, res: Response) => {
+        logErr(err)
+        expect(res.status).toBe(BAD_REQUEST)
+        expect(res.body.error).toBe(errMsg)
+        done()
+      })
+    })
   })
 
   describe(`"POST:${loginPath}"`, () => {
@@ -52,7 +141,7 @@ describe('UserRouter', () => {
 
       // Call API
       callApi(creds).end((err: Error, res: any) => {
-        pErr(err)
+        logErr(err)
         expect(res.status).toBe(OK)
         expect(res.headers['set-cookie'][0]).toContain(jwtCookieProps.key)
         done()
@@ -70,7 +159,7 @@ describe('UserRouter', () => {
 
       // Call API
       callApi(creds).end((err: Error, res: any) => {
-        pErr(err)
+        logErr(err)
         expect(res.status).toBe(UNAUTHORIZED)
         expect(res.body.error).toBe(loginFailedErr)
         done()
@@ -100,7 +189,7 @@ describe('UserRouter', () => {
 
       // Call API
       callApi(creds).end((err: Error, res: any) => {
-        pErr(err)
+        logErr(err)
         expect(res.status).toBe(UNAUTHORIZED)
         expect(res.body.error).toBe(loginFailedErr)
         done()
@@ -120,7 +209,7 @@ describe('UserRouter', () => {
 
       // Call API
       callApi(creds).end((err: Error, res: any) => {
-        pErr(err)
+        logErr(err)
         expect(res.status).toBe(BAD_REQUEST)
         expect(res.body.error).toBeTruthy()
         done()
@@ -131,7 +220,7 @@ describe('UserRouter', () => {
   describe(`"GET:${logoutPath}"`, () => {
     it(`should return a response with a status of ${OK}.`, done => {
       agent.get(logoutPath).end((err: Error, res: any) => {
-        pErr(err)
+        logErr(err)
         expect(res.status).toBe(OK)
         done()
       })
