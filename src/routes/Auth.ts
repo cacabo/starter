@@ -14,10 +14,11 @@ import {
   pwdSaltRounds,
 } from '@shared'
 import { handleBadRequest, handleError } from './handlers'
-import { User, IUser } from '@entities'
+import { User, IUser, UserRoles } from '@entities'
+import { IUserDao } from 'src/daos/User/UserDao'
 
 const router = Router()
-const userDao = new UserDao()
+const userDao: IUserDao = new UserDao()
 const jwtService = new JwtService()
 
 export interface IRegisterBody {
@@ -49,7 +50,10 @@ router.post('/register', async (req: Request, res: Response) => {
       return handleBadRequest(res, getParamMissingError('password'))
     }
     if (!confirmPassword) {
-      return handleBadRequest(res, 'Missing password confirmation')
+      return handleBadRequest(
+        res,
+        getParamMissingError('password confirmation'),
+      )
     }
     if (password.length < 8) {
       return handleBadRequest(res, 'Password must be at least 8 characters.')
@@ -83,14 +87,13 @@ router.post('/login', async (req: Request, res: Response) => {
   try {
     // Check email and password present
     const { email, password } = req.body as ILoginBody
-    if (!(email && password)) {
-      return res.status(BAD_REQUEST).json({
-        error: genericParamMissingError,
-      })
+    if (!email) return handleBadRequest(res, getParamMissingError('email'))
+    if (!password) {
+      return handleBadRequest(res, getParamMissingError('password'))
     }
 
-    // Fetch user
-    const user = await userDao.getOne(email)
+    // Fetch user by their email
+    const user = await userDao.getOneByEmail(email)
     if (!user) {
       return res.status(UNAUTHORIZED).json({
         error: loginFailedError,
@@ -107,7 +110,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
     // Setup Admin Cookie
     const jwt = await jwtService.getJwt({
-      role: user.role,
+      role: user.role || UserRoles.Standard,
       id: user._id,
     })
     const { key, options } = jwtCookieProps

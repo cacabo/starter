@@ -196,25 +196,28 @@ describe('UserRouter', () => {
       })
     })
 
-    it(`should return a response with a status of ${BAD_REQUEST} and a json with an error
-            for all other bad responses.`, done => {
-      // Setup Dummy Data
-      const creds = {
-        email: 'jsmith@gmail.com',
-        password: 'someBadPassword',
-      }
-      spyOn(UserDao.prototype, 'getOne').and.throwError(
-        'Database query failed.',
-      )
+    it(
+      `should return a response with a status of ${BAD_REQUEST} and a json ` +
+        `withan error for all other bad responses.`,
+      done => {
+        // Setup Dummy Data
+        const creds = {
+          email: 'jsmith@gmail.com',
+          password: 'someBadPassword',
+        }
+        spyOn(UserDao.prototype, 'getOneByEmail').and.throwError(
+          'Database query failed.',
+        )
 
-      // Call API
-      callApi(creds).end((err: Error, res: any) => {
-        logErr(err)
-        expect(res.status).toBe(BAD_REQUEST)
-        expect(res.body.error).toBeTruthy()
-        done()
-      })
-    })
+        // Call API
+        callApi(creds).end((err: Error, res: any) => {
+          logErr(err)
+          expect(res.status).toBe(BAD_REQUEST)
+          expect(res.body.error).toBeTruthy()
+          done()
+        })
+      },
+    )
   })
 
   describe(`"GET:${logoutPath}"`, () => {

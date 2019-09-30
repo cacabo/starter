@@ -3,6 +3,7 @@ export enum UserRoles {
   Admin,
 }
 
+// TODO use string not integer
 type TUserRoles = UserRoles.Standard | UserRoles.Admin
 
 export interface IPasswordResetRequest {

@@ -29,7 +29,6 @@
     "module-alias": "^2.2.1",
     "mongoose": "^5.7.1",
     "morgan": "^1.9.1",
-    "randomstring": "^1.1.5",
     "uuid": "^3.3.3",
     "winston": "^3.2.1"
   },
@@ -47,7 +46,6 @@
     "@types/mongoose": "^5.5.18",
     "@types/morgan": "^1.7.37",
     "@types/node": "^12.7.8",
-    "@types/randomstring": "^1.1.6",
     "@types/supertest": "^2.0.8",
     "@types/uuid": "^3.4.5",
     "find": "^0.3.0",

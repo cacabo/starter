@@ -1,6 +1,8 @@
-import randomString from 'randomstring'
+import uuidv4 from 'uuid/v4'
 import jsonwebtoken, { VerifyErrors } from 'jsonwebtoken'
 import { jwtCookieExp } from './cookies'
+
+// TODO remove randomstring
 
 interface IClientData {
   role: number
@@ -13,7 +15,7 @@ export class JwtService {
   private readonly VALIDATION_ERROR = 'JSON-web-token validation failed.'
 
   constructor() {
-    this.secret = process.env.JWT_SECRET || randomString.generate(100)
+    this.secret = process.env.JWT_SECRET || uuidv4()
     this.options = {
       expiresIn: jwtCookieExp + ' days',
     }
