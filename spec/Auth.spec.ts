@@ -9,8 +9,8 @@ import {
   logErr,
   pwdSaltRounds,
   jwtCookieProps,
-  loginFailedErr,
-  paramMissingError,
+  loginFailedError,
+  getParamMissingError,
   passwordsDoNotMatchError,
 } from '@shared'
 import { UserDao } from '@daos'
@@ -82,13 +82,13 @@ describe('UserRouter', () => {
       )
     })
 
-    it(`should return a JSON object with an error message of "${paramMissingError(
+    it(`should return a JSON object with an error message of "${getParamMissingError(
       'email',
     )}" and a status code of "${BAD_REQUEST}" if the email param was missing.`, done => {
       callApi(userDataWithNoEmail).end((err: Error, res: Response) => {
         logErr(err)
         expect(res.status).toBe(BAD_REQUEST)
-        expect(res.body.error).toBe(paramMissingError('email'))
+        expect(res.body.error).toBe(getParamMissingError('email'))
         done()
       })
     })
@@ -149,7 +149,7 @@ describe('UserRouter', () => {
     })
 
     it(`should return a response with a status of ${UNAUTHORIZED} and a json with the error
-            "${loginFailedErr}" if the email was not found.`, done => {
+            "${loginFailedError}" if the email was not found.`, done => {
       // Setup Dummy Data
       const creds = {
         email: 'jsmith@gmail.com',
@@ -161,13 +161,13 @@ describe('UserRouter', () => {
       callApi(creds).end((err: Error, res: any) => {
         logErr(err)
         expect(res.status).toBe(UNAUTHORIZED)
-        expect(res.body.error).toBe(loginFailedErr)
+        expect(res.body.error).toBe(loginFailedError)
         done()
       })
     })
 
     it(`should return a response with a status of ${UNAUTHORIZED} and a json with the error
-            "${loginFailedErr}" if the password failed.`, done => {
+            "${loginFailedError}" if the password failed.`, done => {
       // Setup Dummy Data
       const creds = {
         email: 'jsmith@gmail.com',
@@ -191,7 +191,7 @@ describe('UserRouter', () => {
       callApi(creds).end((err: Error, res: any) => {
         logErr(err)
         expect(res.status).toBe(UNAUTHORIZED)
-        expect(res.body.error).toBe(loginFailedErr)
+        expect(res.body.error).toBe(loginFailedError)
         done()
       })
     })

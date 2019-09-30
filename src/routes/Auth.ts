@@ -4,9 +4,10 @@ import { BAD_REQUEST, OK, UNAUTHORIZED, CREATED } from 'http-status-codes'
 import { UserDao } from '@daos'
 
 import {
-  paramMissingError,
+  getParamMissingError,
   passwordsDoNotMatchError,
-  loginFailedErr,
+  genericParamMissingError,
+  loginFailedError,
   logger,
   jwtCookieProps,
   JwtService,
@@ -19,7 +20,7 @@ const router = Router()
 const userDao = new UserDao()
 const jwtService = new JwtService()
 
-export interface IRegisterUserBody {
+export interface IRegisterBody {
   email: string
   password: string
   confirmPassword: string
@@ -35,14 +36,18 @@ router.post('/register', async (req: Request, res: Response) => {
       confirmPassword,
       firstName,
       lastName,
-    } = req.body as IRegisterUserBody
+    } = req.body as IRegisterBody
 
-    if (!email) return handleBadRequest(res, paramMissingError('email'))
+    if (!email) return handleBadRequest(res, getParamMissingError('email'))
     if (!firstName) {
-      return handleBadRequest(res, paramMissingError('first name'))
+      return handleBadRequest(res, getParamMissingError('first name'))
     }
-    if (!lastName) return handleBadRequest(res, paramMissingError('last name'))
-    if (!password) return handleBadRequest(res, paramMissingError('password'))
+    if (!lastName) {
+      return handleBadRequest(res, getParamMissingError('last name'))
+    }
+    if (!password) {
+      return handleBadRequest(res, getParamMissingError('password'))
+    }
     if (!confirmPassword) {
       return handleBadRequest(res, 'Missing password confirmation')
     }
@@ -66,16 +71,21 @@ router.post('/register', async (req: Request, res: Response) => {
   }
 })
 
+export interface ILoginBody {
+  email: string
+  password: string
+}
+
 /**
  * Login
  */
 router.post('/login', async (req: Request, res: Response) => {
   try {
     // Check email and password present
-    const { email, password } = req.body
+    const { email, password } = req.body as ILoginBody
     if (!(email && password)) {
       return res.status(BAD_REQUEST).json({
-        error: paramMissingError(),
+        error: genericParamMissingError,
       })
     }
 
@@ -83,7 +93,7 @@ router.post('/login', async (req: Request, res: Response) => {
     const user = await userDao.getOne(email)
     if (!user) {
       return res.status(UNAUTHORIZED).json({
-        error: loginFailedErr,
+        error: loginFailedError,
       })
     }
 
@@ -91,7 +101,7 @@ router.post('/login', async (req: Request, res: Response) => {
     const pwdPassed = await bcrypt.compare(password, user.passwordHash)
     if (!pwdPassed) {
       return res.status(UNAUTHORIZED).json({
-        error: loginFailedErr,
+        error: loginFailedError,
       })
     }
 

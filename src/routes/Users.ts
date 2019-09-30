@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express'
 import { BAD_REQUEST, CREATED, OK, NOT_FOUND } from 'http-status-codes'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { UserDao } from '@daos'
-import { paramMissingError, adminMW } from '@shared'
+import { genericParamMissingError, adminMW } from '@shared'
 import { IUser } from '@entities'
 import { IUserDao } from 'src/daos/User/UserDao'
 import { handleError, handleNotFound, handleBadRequest } from './handlers'
@@ -56,7 +56,7 @@ router.put('/:id/update', adminMW, async (req: Request, res: Response) => {
     const { user } = req.body as IUpdateUserBody
     if (!user) {
       return res.status(BAD_REQUEST).json({
-        error: paramMissingError(),
+        error: genericParamMissingError,
       })
     }
 

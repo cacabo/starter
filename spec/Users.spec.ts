@@ -6,7 +6,7 @@ import { Response, SuperTest, Test } from 'supertest'
 import { IUser, User } from '@entities'
 import { UserDao } from '@daos'
 import { login } from './support/LoginAgent'
-import { logErr, paramMissingError } from '@shared'
+import { logErr, genericParamMissingError } from '@shared'
 
 describe('UserRouter', () => {
   const usersPath = '/api/users'
@@ -130,13 +130,13 @@ describe('UserRouter', () => {
       })
     })
 
-    it(`should return a JSON object with an error message of "${paramMissingError()}" and a
+    it(`should return a JSON object with an error message of "${genericParamMissingError}" and a
             status code of "${BAD_REQUEST}" if the user param was missing.`, done => {
       callApi('2', {}).end((err: Error, res: Response) => {
         logErr(err)
         expect(res.status).toBe(BAD_REQUEST)
         expect(res.body.error).toBeTruthy()
-        expect(res.body.error).toBe(paramMissingError())
+        expect(res.body.error).toBe(genericParamMissingError)
         done()
       })
     })
