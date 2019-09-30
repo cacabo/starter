@@ -1,15 +1,28 @@
-import { IUser, User, IPasswordResetRequest } from '@entities'
+import { IUser, IPasswordResetRequest } from '@entities'
 import { UserModel, IUserModel } from '../models'
 import uuidv4 from 'uuid/v4'
 import bcrypt from 'bcrypt'
+
+// TODO custom error types
 
 export interface IUserDao {
   getOne: (id: any) => Promise<IUser | null>
   getOneByEmail: (email: string) => Promise<IUser | null>
   getAll: () => Promise<IUser[]>
-  add: (user: IUser) => Promise<IUser>
-  update: (user: IUser) => Promise<IUser>
+  create: (user: IUser) => Promise<IUser>
+  update: (id: any, user: Partial<IUser>) => Promise<IUser>
   delete: (id: any) => Promise<void>
+  changePassword: (
+    id: any,
+    password: string,
+    newPassword: string,
+  ) => Promise<IUser>
+  requestForgotPassword(id: any): Promise<IUser>
+  resetForgotPassword(
+    id: any,
+    token: string,
+    newPassword: string,
+  ): Promise<IUser>
 }
 
 export class UserDao implements IUserDao {
@@ -34,16 +47,18 @@ export class UserDao implements IUserDao {
   /**
    * @param user
    */
-  public async add(user: IUser): Promise<IUserModel> {
+  public async create(user: IUser): Promise<IUserModel> {
     const userObj = new UserModel(user)
     return userObj.save()
   }
 
   /**
+   * @param id of the user
    * @param user
    */
-  public async update(user: IUser): Promise<IUserModel> {
-    return UserModel.findByIdAndUpdate(user._id, user).then(somtimesUser => {
+  public async update(id: any, user: Partial<IUser>): Promise<IUserModel> {
+    if (!id) throw new Error('Missing user id')
+    return UserModel.findByIdAndUpdate(id, user).then(somtimesUser => {
       if (!somtimesUser) throw new Error('User not found')
       return somtimesUser
     })
@@ -80,13 +95,13 @@ export class UserDao implements IUserDao {
     const editedUser: IUser = Object.assign({}, user, {
       passwordHash: 'TODO',
     })
-    return await this.update(editedUser)
+    return await this.update(id, editedUser)
   }
 
   /**
    * @param id of the user
    */
-  public async requestForgotPassword(id: any) {
+  public async requestForgotPassword(id: any): Promise<IUserModel> {
     const user = await this.getOne(id)
     if (!user) throw new Error('User not found')
     const token = uuidv4() // Create a new random token
@@ -98,7 +113,7 @@ export class UserDao implements IUserDao {
 
     // TODO send email
     const editedUser: IUser = Object.assign({}, user, { passwordResetRequest })
-    return await this.update(editedUser)
+    return await this.update(id, editedUser)
   }
 
   /**
@@ -110,7 +125,7 @@ export class UserDao implements IUserDao {
     id: any,
     token: string,
     newPassword: string,
-  ) {
+  ): Promise<IUserModel> {
     const user = await this.getOne(id)
     if (!user) throw new Error('User not found')
     const { passwordResetRequest } = user
@@ -124,6 +139,6 @@ export class UserDao implements IUserDao {
       passwordResetRequest: null,
       passwordHash: 'TODO',
     })
-    return await this.update(editedUser)
+    return await this.update(id, editedUser)
   }
 }

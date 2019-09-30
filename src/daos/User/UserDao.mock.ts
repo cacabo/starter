@@ -47,26 +47,28 @@ export class UserDao extends MockDaoMock implements IUserDao {
     }
   }
 
-  public async add(user: IUser): Promise<IUser> {
+  public async create(user: IUser): Promise<IUser> {
     try {
       const db = await super.openDb()
-      user._id = uuidv4()
-      db.users.push(user)
+      const userObj: IUser = Object.assign({}, user, { _id: uuidv4() })
+      db.users.push(userObj)
       await super.saveDb(db)
-      return user
+      return userObj
     } catch (err) {
       throw err
     }
   }
 
-  public async update(user: IUser): Promise<IUser> {
+  public async update(id: any, user: Partial<IUser>): Promise<IUser> {
     try {
       const db = await super.openDb()
       for (let i = 0; i < db.users.length; i++) {
-        if (db.users[i].id === user._id) {
-          db.users[i] = user
+        if (db.users[i]._id === id) {
+          const existingUser: IUser = db.users[i]
+          const editedUser: IUser = Object.assign({}, existingUser, user)
+          db.users[i] = editedUser
           await super.saveDb(db)
-          return user
+          return editedUser
         }
       }
       throw new Error('User not found')
@@ -108,13 +110,13 @@ export class UserDao extends MockDaoMock implements IUserDao {
     const editedUser = Object.assign({}, user, {
       passwordHash: newPassword,
     })
-    return await this.update(editedUser)
+    return await this.update(id, editedUser)
   }
 
   /**
    * @param id of the user
    */
-  public async requestForgotPassword(id: any) {
+  public async requestForgotPassword(id: any): Promise<IUser> {
     const user = await this.getOne(id)
     if (!user) throw new Error('User not found')
     const token = uuidv4() // Create a new random token
@@ -125,7 +127,7 @@ export class UserDao extends MockDaoMock implements IUserDao {
     }
 
     const editedUser: IUser = Object.assign({}, user, { passwordResetRequest })
-    return await this.update(editedUser)
+    return await this.update(editedUser, id)
   }
 
   /**
@@ -153,6 +155,6 @@ export class UserDao extends MockDaoMock implements IUserDao {
       passwordResetRequest: null,
       passwordHash: newPassword,
     })
-    return await this.update(editedUser)
+    return await this.update(id, editedUser)
   }
 }

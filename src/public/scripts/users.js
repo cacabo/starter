@@ -72,7 +72,7 @@ document.addEventListener(
       logoutUser()
     }
   },
-  false
+  false,
 )
 
 function addUser() {
@@ -84,7 +84,7 @@ function addUser() {
       email: emailInput.value,
     },
   }
-  Http.Post('/api/users/add', data).then(() => {
+  Http.Post('/api/users/new', data).then(() => {
     displayUsers()
   })
 }
@@ -115,14 +115,14 @@ function submitEdit(ele) {
       id: id,
     },
   }
-  Http.Put('/api/users/update', data).then(() => {
+  Http.Put('/api/users/:id/update', data).then(() => {
     displayUsers()
   })
 }
 
 function deleteUser(ele) {
   var id = ele.getAttribute('data-user-id')
-  Http.Delete('/api/users/delete/' + id).then(() => {
+  Http.Delete(`/api/users/${id}/delete`).then(() => {
     displayUsers()
   })
 }

@@ -10,8 +10,15 @@ export interface IPasswordResetRequest {
   expires: Date
 }
 
+export interface ICreateUser {
+  firstName: string
+  lastName: string
+  email: string
+  passwordHash: string
+}
+
 export interface IUser {
-  _id: any
+  _id?: string
   firstName: string
   lastName: string
   email: string
@@ -21,6 +28,7 @@ export interface IUser {
   passwordResetRequest?: IPasswordResetRequest
 }
 
+// TODO what is the point of having a class?
 export class User implements IUser {
   public _id: any
   public firstName: string
@@ -32,6 +40,7 @@ export class User implements IUser {
 
   constructor(
     user?: IUser,
+    _id?: any,
     firstName?: string,
     lastName?: string,
     email?: string,
@@ -39,12 +48,14 @@ export class User implements IUser {
     role?: TUserRoles,
   ) {
     if (user) {
+      this._id = user._id
       this.firstName = user.firstName
       this.lastName = user.lastName
       this.email = user.email
       this.passwordHash = user.passwordHash
       this.role = user.role || UserRoles.Standard
     } else {
+      this._id = _id
       this.firstName = firstName || ''
       this.lastName = lastName || ''
       this.email = email || ''
