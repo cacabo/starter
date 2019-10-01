@@ -1,5 +1,1 @@
 # Starter
-
-**TODO**
-
-- [ ] Configure MongoDB
